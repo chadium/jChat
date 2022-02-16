@@ -311,10 +311,21 @@ Chat = {
                 }
             } else {
                 var badges = [];
+
+                // Fork.
+                if (nick === 'leezhoney') {
+                    badges.push({
+                        description: 'Friend zoned lol',
+                        url: 'http://192.168.1.1:54019/L.png',
+                        priority: true
+                    });
+                }
+
                 const priorityBadges = ['predictions', 'admin', 'global_mod', 'staff', 'twitchbot', 'broadcaster', 'moderator', 'vip'];
                 if (typeof(info.badges) === 'string') {
                     info.badges.split(',').forEach(badge => {
                         badge = badge.split('/');
+
                         var priority = (priorityBadges.includes(badge[0]) ? true : false);
                         badges.push({
                             description: badge[0],
