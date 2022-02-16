@@ -2,3 +2,6 @@ credentials.js
 backups/
 t/
 .vscode
+
+# Forked stuff.
+/node_modules
