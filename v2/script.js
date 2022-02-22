@@ -314,11 +314,11 @@ Chat = {
 
                 // Fork.
                 if (nick === 'leezhoney') {
-                    badges.push({
-                        description: 'Friend zoned lol',
-                        url: 'http://192.168.1.1:54019/L.png',
-                        priority: true
-                    });
+                    // badges.push({
+                    //     description: 'Friend zoned lol',
+                    //     url: 'http://192.168.1.1:54019/L.png',
+                    //     priority: true
+                    // });
                 }
 
                 const priorityBadges = ['predictions', 'admin', 'global_mod', 'staff', 'twitchbot', 'broadcaster', 'moderator', 'vip'];
