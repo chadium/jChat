@@ -10,13 +10,16 @@ const fonts = [
     'DancingScript',
     'IndieFlower',
     'PressStart2P',
-    'Wallpoet'
+    'Wallpoet',
+    'Arimo'
 ];
 
 const sizes = [
     'small',
     'medium',
-    'large'
+    'large',
+    'custom_large',
+    'custom_medium',
 ];
 
 const strokes = [
@@ -29,5 +32,6 @@ const strokes = [
 const shadows = [
     'small',
     'medium',
-    'large'
+    'large',
+    'custom_stroke'
 ];
