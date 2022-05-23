@@ -173,8 +173,8 @@ Chat = {
         }
 
         // Load cheers images
-        TwitchAPI("https://api.twitch.tv/v5/bits/actions?channel_id=" + Chat.info.channelID).done(function(res) {
-            res.actions.forEach(action => {
+        TwitchAPI("/cheermotes?broadcaster_id=" + Chat.info.channelID).done(function(res) {
+            res.data.forEach(action => {
                 Chat.info.cheers[action.prefix] = {}
                 action.tiers.forEach(tier => {
                     Chat.info.cheers[action.prefix][tier.min_bits] = {
