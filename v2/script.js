@@ -301,6 +301,8 @@ Chat = {
             var $userInfo = $('<span></span>');
             $userInfo.addClass('user_info');
 
+            var badges = [];
+
             // Writing badges
             if (Chat.info.hideBadges) {
                 if (typeof(info.badges) === 'string') {
@@ -313,22 +315,6 @@ Chat = {
                     });
                 }
             } else {
-                var badges = [];
-
-                // Fork.
-                if (Chat.info.customBadges) {
-                    if (Chat.info.customBadges.users[nick]) {
-                        for (let index of Chat.info.customBadges.users[nick]) {
-                            let url = Chat.info.customBadges.badges[index]
-                            badges.push({
-                                description: 'custom badge',
-                                url,
-                                priority: true
-                            });
-                        }
-                    }
-                }
-
                 const priorityBadges = ['predictions', 'admin', 'global_mod', 'staff', 'twitchbot', 'broadcaster', 'moderator', 'vip'];
                 if (typeof(info.badges) === 'string') {
                     info.badges.split(',').forEach(badge => {
@@ -365,15 +351,29 @@ Chat = {
                         $userInfo.append($badge);
                     });
                 }
-                badges.forEach(badge => {
-                    if (!badge.priority) {
-                        var $badge = $('<img/>');
-                        $badge.addClass('badge');
-                        $badge.attr('src', badge.url);
-                        $userInfo.append($badge);
-                    }
-                });
             }
+
+            if (Chat.info.customBadges) {
+                if (Chat.info.customBadges.users[nick]) {
+                    for (let index of Chat.info.customBadges.users[nick]) {
+                        let url = Chat.info.customBadges.badges[index]
+                        badges.push({
+                            description: 'custom badge',
+                            url,
+                            priority: true
+                        });
+                    }
+                }
+            }
+
+            badges.forEach(badge => {
+                if (!badge.priority) {
+                    var $badge = $('<img/>');
+                    $badge.addClass('badge');
+                    $badge.attr('src', badge.url);
+                    $userInfo.append($badge);
+                }
+            });
 
             // Writing username
             var $username = $('<span></span>');
