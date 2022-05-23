@@ -39,8 +39,12 @@ app.use('/settings.js', express.static('../settings.js'))
 app.use('/utils.js', express.static('../utils.js'))
 
 app.get('/user-badges', asyncHandler(async (req, res) => {
-  res.json({
+  let response = await twentyEightApiFetch({
+    url: `${process.env.CENTRAL_API_PREFIX}/custom-badges/twitch`,
+    query: {}
   })
+
+  res.json(response.data)
 }))
 
 app.get('/cheermotes', asyncHandler(async (req, res) => {

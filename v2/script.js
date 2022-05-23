@@ -36,6 +36,7 @@ Chat = {
         bttvBadges: null,
         seventvBadges: null,
         chatterinoBadges: null,
+        customBadges: null,
         cheers: {},
         lines: [],
         blockedUsers: ('block' in $.QueryString ? $.QueryString.block.toLowerCase().split(',') : false),
@@ -171,6 +172,10 @@ Chat = {
                     Chat.info.chatterinoBadges = [];
                 });
         }
+
+        TwitchAPI("/user-badges").done(function(res) {
+            Chat.info.customBadges = res
+        });
 
         // Load cheers images
         TwitchAPI("/cheermotes?broadcaster_id=" + Chat.info.channelID).done(function(res) {
@@ -311,12 +316,17 @@ Chat = {
                 var badges = [];
 
                 // Fork.
-                if (nick === 'leezhoney') {
-                    // badges.push({
-                    //     description: 'Friend zoned lol',
-                    //     url: 'http://192.168.1.1:54019/L.png',
-                    //     priority: true
-                    // });
+                if (Chat.info.customBadges) {
+                    if (Chat.info.customBadges.users[nick]) {
+                        for (let index of Chat.info.customBadges.users[nick]) {
+                            let url = Chat.info.customBadges.badges[index]
+                            badges.push({
+                                description: 'custom badge',
+                                url,
+                                priority: true
+                            });
+                        }
+                    }
                 }
 
                 const priorityBadges = ['predictions', 'admin', 'global_mod', 'staff', 'twitchbot', 'broadcaster', 'moderator', 'vip'];
