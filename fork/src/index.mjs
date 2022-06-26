@@ -1,8 +1,8 @@
 import express from 'express'
 import cors from 'cors'
-import fetch from 'node-fetch'
-import { OAuthSession } from "../../../services/oauth-local/src/index.mjs"
-import { twentyEightApiFetch, TwentyEightApiFetchServerError, TwentyEightApiFetchClientError } from '../../../services/twenty-eight-api-fetch/src/index.mjs'
+import { twitchApiRequest } from "../../../../services/twitch-api-request/src/index.mjs"
+import { OAuthSession } from "../../../../services/oauth-local/src/index.mjs"
+import { twentyEightApiFetch, TwentyEightApiFetchServerError, TwentyEightApiFetchClientError } from '../../../../services/twenty-eight-api-fetch/src/index.mjs'
 import "./dotenv.mjs"
 
 let session = new OAuthSession({
@@ -50,17 +50,16 @@ app.get('/user-badges', asyncHandler(async (req, res) => {
 app.get('/cheermotes', asyncHandler(async (req, res) => {
   let { broadcaster_id } = req.query
 
-  let response = await session.try(({ accessToken, clientId }) => fetch(
-    'https://api.twitch.tv/helix/bits/cheermotes?' + new URLSearchParams({ broadcaster_id }),
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Client-Id': clientId
-      },
-    }
-  ))
+  let response = await session.try(({ accessToken, clientId }) => twitchApiRequest({
+    url: 'https://api.twitch.tv/helix/bits/cheermotes',
+    query: {
+      broadcaster_id
+    },
+    accessToken,
+    clientId,
+  }))
 
-  res.json(await response.json())
+  res.json(response.data)
 }))
 
 app.use(function (err, req, res, next) {
