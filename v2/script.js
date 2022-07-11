@@ -192,7 +192,8 @@ Chat = {
 
         let style = document.createElement('style')
         document.head.append(style)
-        let socket = new ReconnectingWebSocket(`ws://${window.location.host}/color`, 'irc', { reconnectInterval: 2000 });
+        let wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
+        let socket = new ReconnectingWebSocket(`${wsProtocol}://${window.location.host}/color`, 'irc', { reconnectInterval: 2000 });
         socket.onmessage = (e) => {
             let data = JSON.parse(e.data)
 
