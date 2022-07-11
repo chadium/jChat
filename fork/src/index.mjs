@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import { createProxyMiddleware } from 'http-proxy-middleware'
 import { twitchApiRequest } from "../../../../services/twitch-api-request/src/index.mjs"
 import { OAuthSession } from "../../../../services/oauth-local/src/index.mjs"
 import { twentyEightApiFetch, TwentyEightApiFetchServerError, TwentyEightApiFetchClientError } from '../../../../services/twenty-eight-api-fetch/src/index.mjs'
@@ -31,6 +32,8 @@ function asyncHandler(handler) {
   }
 }
 
+app.use('/color', createProxyMiddleware(`${process.env.CENTRAL_WS_API_PREFIX}/color`));
+
 app.use('/fork/customcss.css', express.static('./customcss.css'))
 app.use('/v2', express.static('../v2'))
 app.use('/img', express.static('../img'))
@@ -40,7 +43,7 @@ app.use('/utils.js', express.static('../utils.js'))
 
 app.get('/user-badges', asyncHandler(async (req, res) => {
   let response = await twentyEightApiFetch({
-    url: `${process.env.CENTRAL_API_PREFIX}/custom-badges/twitch`,
+    url: `${process.env.CENTRAL_HTTP_API_PREFIX}/custom-badges/twitch`,
     query: {}
   })
 

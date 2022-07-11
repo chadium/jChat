@@ -10,6 +10,17 @@
 }
 
 html body {
-    background-color: transparent;
-    margin: 0px;
+  background-color: transparent;
+  margin: 0px;
+}
+
+#chat_container {
+  border-left: 3px solid var(--daniel-bg-color);
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.chat_line:first-child {
+  margin-top: 0
 }

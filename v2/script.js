@@ -190,6 +190,17 @@ Chat = {
             });
         });
 
+        let style = document.createElement('style')
+        document.head.append(style)
+        let socket = new ReconnectingWebSocket(`ws://${window.location.host}/color`, 'irc', { reconnectInterval: 2000 });
+        socket.onmessage = (e) => {
+            let data = JSON.parse(e.data)
+
+            style.textContent = `:root {
+                --daniel-bg-color: ${data.color};
+            }`
+        }
+
         callback(true);
     },
 
