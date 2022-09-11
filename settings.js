@@ -33,5 +33,6 @@ const shadows = [
     'small',
     'medium',
     'large',
-    'custom_stroke'
+    'custom_stroke',
+    'custom_small',
 ];
