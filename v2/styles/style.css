@@ -15,11 +15,14 @@ body {
 }
 
 .chat_line {
-    padding-top: 1ex;
+    float: left;
+    clear: both;
+    margin-top: 1ex;
+    padding: 0 1ex;
 }
 
 .chat_line:first-child {
-    padding-top: 0;
+    margin-top: 0;
 }
 
 .user_info,
@@ -29,6 +32,7 @@ body {
 }
 
 .user_badge {
+    margin-left: -1ex;
     width: 3em;
     height: var(--daniel-chat-line-height);
     text-align: center;
@@ -46,7 +50,7 @@ body {
 .user_cool_shape {
     width: 1.5em;
     height: var(--daniel-chat-line-height);
-    clip-path: polygon(-1px 0, 100% 100%, -1px 100%);
+    clip-path: polygon(-1px 100%, -1% 0%, 100% 0);
     display: inline-block;
     vertical-align: bottom;
 }
