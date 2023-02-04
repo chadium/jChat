@@ -251,11 +251,13 @@ Chat = {
                 linesToDelete--;
             }
         } else if (Chat.info.fade) {
-            var messageTime = $('.chat_line').eq(0).data('time');
+            let elem = $('.chat_line').eq(0);
+            var messageTime = elem.data('time');
             if ((Date.now() - messageTime) / 1000 >= Chat.info.fade) {
-                $('.chat_line').eq(0).fadeOut(function() {
-                    $(this).remove();
-                });
+                elem.addClass('chat_line--disappear')
+                setTimeout(() => {
+                    elem.remove();
+                }, 200)
             }
         }
     }, 200),

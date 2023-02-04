@@ -34,6 +34,22 @@ body {
     }
 }
 
+.chat_line--disappear {
+    animation: disappear 200ms ease-out;
+}
+
+@keyframes disappear {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
 .chat_line:first-child {
     margin-top: 0;
 }
