@@ -19,6 +19,19 @@ body {
     clear: both;
     margin-top: 1ex;
     padding: 0 1ex;
+    animation: show-up 200ms ease-out;
+}
+
+@keyframes show-up {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .chat_line:first-child {
