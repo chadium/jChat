@@ -3,6 +3,9 @@
   --daniel-bg-color: #0f0f0f;
   --daniel-progress-color: #666;
 
+  --daniel-chat-font-size: 48px;
+  --daniel-chat-line-height: calc(var(--daniel-chat-font-size) * 1.5);
+
   --transition-speed: 1000ms;
   --transition-color: background-color var(--transition-speed),
                       color var(--transition-speed),
@@ -15,10 +18,11 @@ html body {
 }
 
 #chat_container {
-  border-left: 3px solid var(--daniel-bg-color);
   margin-top: 0;
   padding-top: 0;
   padding-bottom: 0;
+  font-size: var(--daniel-chat-font-size);
+  line-height: var(--daniel-chat-line-height);
 }
 
 .chat_line:first-child {

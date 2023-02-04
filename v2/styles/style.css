@@ -6,24 +6,60 @@ body {
 }
 
 #chat_container {
-    width: calc(100% - 20px);
-    padding: 10px;
+    width: 100%;
     position: absolute;
     bottom: 0;
     overflow: hidden;
-    background-color: transparent;
     color: white;
-    font-weight: 800;
     word-break: break-word;
 }
 
-.user_info {
+.chat_line {
+    padding-top: 1ex;
+}
+
+.chat_line:first-child {
+    padding-top: 0;
+}
+
+.user_info,
+.user_badge,
+.user_cool_shape {
+    background: linear-gradient(#efefef, #c2c2c2);
+}
+
+.user_badge {
+    width: 3em;
+    height: var(--daniel-chat-line-height);
+    text-align: center;
     display: inline-block;
+    vertical-align: bottom;
+}
+
+.user_info {
+    font-weight: bold;
+    text-shadow: 2px 2px 2px white;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.user_cool_shape {
+    width: 1.5em;
+    height: var(--daniel-chat-line-height);
+    clip-path: polygon(-1px 0, 100% 100%, -1px 100%);
+    display: inline-block;
+    vertical-align: bottom;
 }
 
 .badge {
-    vertical-align: middle;
-    border-radius: 10%;
+    vertical-align: bottom;
+    width: var(--daniel-chat-line-height);
+    height: var(--daniel-chat-line-height);
+}
+
+.message {
+    font-weight: bold;
+    text-shadow: 2px 2px 2px black, 0px 0px 2px black;
 }
 
 .zero-width_container {
@@ -33,23 +69,23 @@ body {
     vertical-align: middle;
 }
 
-.cheer_bits {
-    font-size: 0.6em;
-    -webkit-text-stroke: 1px black;
+.emoji,
+.emote,
+.cheer_emote {
+    vertical-align: bottom;
+    height: var(--daniel-chat-line-height);
 }
 
-.emote {
-    vertical-align: middle;
+.cheer_bits {
+    font-size: 0.8em;
+    -webkit-text-stroke: 1px black;
 }
 
 .zero-width {
     position: absolute;
 }
 
-.emoji {
-    vertical-align: middle;
-}
-
 .hidden {
     display: none;
 }
+
