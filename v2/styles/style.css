@@ -33,11 +33,29 @@ body {
 
 .user_badge {
     margin-left: -1ex;
-    width: 3em;
+    width: 2em;
     height: var(--daniel-chat-line-height);
     text-align: center;
     display: inline-block;
     vertical-align: bottom;
+}
+
+.user_badge:empty::before {
+    content: "";
+    display: inline-block;
+    width: calc(var(--daniel-chat-line-height) / 3);
+    height: calc(var(--daniel-chat-line-height) / 3);
+    transform: rotate(45deg);
+    background: #aaa;
+    vertical-align: middle;
+
+    /* Top */
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+
+    /* Bottom */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .user_info {
