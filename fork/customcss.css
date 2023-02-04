@@ -2,6 +2,7 @@
   --daniel-fg-color: white;
   --daniel-bg-color: #0f0f0f;
   --daniel-progress-color: #666;
+  --daniel-user-background: linear-gradient(#efefef, #c2c2c2);
 
   --daniel-chat-font-size: 48px;
   --daniel-chat-line-height: calc(var(--daniel-chat-font-size) * 1.5);

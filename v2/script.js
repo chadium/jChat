@@ -412,17 +412,20 @@ Chat = {
                 }
             }
 
-            // Writing username
-            var $username = $('<span></span>');
-            $username.addClass('nick');
+            // Color.
             if (typeof(info.color) === 'string') {
-                if (tinycolor(info.color).getBrightness() <= 50) var color = tinycolor(info.color).lighten(30);
-                else var color = info.color;
+                // if (tinycolor(info.color).getBrightness() <= 50) var color = tinycolor(info.color).lighten(30);
+                // else var color = info.color;
+                var color = info.color
             } else {
                 const twitchColors = ["#FF0000", "#0000FF", "#008000", "#B22222", "#FF7F50", "#9ACD32", "#FF4500", "#2E8B57", "#DAA520", "#D2691E", "#5F9EA0", "#1E90FF", "#FF69B4", "#8A2BE2", "#00FF7F"];
                 var color = twitchColors[nick.charCodeAt(0) % 15];
             }
-            $username.css('color', color);
+            $chatLine.prop('style', `--daniel-user-background: ${color}`);
+
+            // Writing username
+            var $username = $('<span></span>');
+            $username.addClass('nick');
             $username.html(info['display-name'] ? info['display-name'] : nick);
             $userInfo.append($username);
 
