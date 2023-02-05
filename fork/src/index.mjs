@@ -40,7 +40,7 @@ let broadcasterId = await userId(session, process.env.TWITCH_CHANNEL)
 
 const app = express()
 
-const port = 54021
+const port = process.env.PORT
 
 app.use(express.json());
 app.use(cors());
