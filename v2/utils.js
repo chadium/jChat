@@ -18,6 +18,30 @@ function escapeHtml(message) {
         .replace(/(>)(?!\()/g, "&gt;");
 }
 
+function GetJson(url, {
+    timeout = 10000
+} = {}) {
+    let error = new Error("Response error")
+    error.name = 'ResponseError'
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url,
+            timeout
+        })
+            .done((data) => {
+                resolve(data)
+            })
+            .fail((response) => {
+                error.message = response.statusMessage
+                error.response = response
+                reject(error)
+            })
+    })
+}
+
 function TwitchAPI(url) {
-    return $.getJSON(url);
+    return GetJson(url, {
+        timeout: 5000
+    })
 }

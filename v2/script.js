@@ -49,7 +49,7 @@ Chat = {
         Chat.info.emotes = {};
         // Load BTTV, FFZ and 7TV emotes
         ['emotes/global', 'users/twitch/' + encodeURIComponent(channelID)].forEach(endpoint => {
-            $.getJSON('https://api.betterttv.net/3/cached/frankerfacez/' + endpoint).done(function(res) {
+            GetJson('https://api.betterttv.net/3/cached/frankerfacez/' + endpoint).then(function(res) {
                 res.forEach(emote => {
                     if (emote.images['4x']) {
                         var imageUrl = emote.images['4x'];
@@ -68,7 +68,7 @@ Chat = {
         });
 
         ['emotes/global', 'users/twitch/' + encodeURIComponent(channelID)].forEach(endpoint => {
-            $.getJSON('https://api.betterttv.net/3/cached/' + endpoint).done(function(res) {
+            GetJson('https://api.betterttv.net/3/cached/' + endpoint).then(function(res) {
                 if (!Array.isArray(res)) {
                     res = res.channelEmotes.concat(res.sharedEmotes);
                 }
@@ -83,7 +83,7 @@ Chat = {
         });
 
         ['emotes/global', 'users/' + encodeURIComponent(channelID) + '/emotes'].forEach(endpoint => {
-            $.getJSON('https://api.7tv.app/v2/' + endpoint).done(function(res) {
+            GetJson('https://api.7tv.app/v2/' + endpoint).then(function(res) {
                 res.forEach(emote => {
                     Chat.info.emotes[emote.name] = {
                         id: emote.id,
@@ -95,7 +95,7 @@ Chat = {
         });
     },
 
-    load: function(callback) {
+    load: async function(callback) {
         if (Chat.info.fontSize === null) {
             // I guess I'll have to calculate based on the width of the
             // view port.
@@ -105,116 +105,120 @@ Chat = {
 
         Chat.style = document.createElement('style')
         document.head.append(Chat.style)
-        
-        TwitchAPI("/info").done(function(res) {
+
+        {
+            let res = await GetJson("/info")
             if (Chat.info.channel === null) {
                 Chat.info.channel = res.channelName;
             }
 
             Chat.info.channelID = res.channelId;
             Chat.loadEmotes(Chat.info.channelID);
+        }
 
-            // Load CSS
-            let font = fonts[Chat.info.font];
+        // Load CSS
+        let font = fonts[Chat.info.font];
 
-            appendCSS('font', font);
+        appendCSS('font', font);
 
-            if (Chat.info.stroke && Chat.info.stroke > 0) {
-                let stroke = strokes[Chat.info.stroke - 1];
-                appendCSS('stroke', stroke);
-            }
-            if (Chat.info.smallCaps) {
-                appendCSS('variant', 'SmallCaps');
-            }
+        if (Chat.info.stroke && Chat.info.stroke > 0) {
+            let stroke = strokes[Chat.info.stroke - 1];
+            appendCSS('stroke', stroke);
+        }
+        if (Chat.info.smallCaps) {
+            appendCSS('variant', 'SmallCaps');
+        }
 
-            // Load badges
-            TwitchAPI('https://badges.twitch.tv/v1/badges/global/display').done(function(global) {
-                Object.entries(global.badge_sets).forEach(badge => {
+        // Load badges
+        TwitchAPI('https://badges.twitch.tv/v1/badges/global/display').then(function(global) {
+            Object.entries(global.badge_sets).forEach(badge => {
+                Object.entries(badge[1].versions).forEach(v => {
+                    Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
+                });
+            });
+            TwitchAPI('https://badges.twitch.tv/v1/badges/channels/' + encodeURIComponent(Chat.info.channelID) + '/display').then(function(channel) {
+                Object.entries(channel.badge_sets).forEach(badge => {
                     Object.entries(badge[1].versions).forEach(v => {
                         Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
                     });
                 });
-                TwitchAPI('https://badges.twitch.tv/v1/badges/channels/' + encodeURIComponent(Chat.info.channelID) + '/display').done(function(channel) {
-                    Object.entries(channel.badge_sets).forEach(badge => {
-                        Object.entries(badge[1].versions).forEach(v => {
-                            Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
-                        });
-                    });
-                    $.getJSON('https://api.frankerfacez.com/v1/_room/id/' + encodeURIComponent(Chat.info.channelID)).done(function(res) {
-                        if (res.room.moderator_badge) {
-                            Chat.info.badges['moderator:1'] = 'https://cdn.frankerfacez.com/room-badge/mod/' + Chat.info.channel + '/4/rounded';
-                        }
-                        if (res.room.vip_badge) {
-                            Chat.info.badges['vip:1'] = 'https://cdn.frankerfacez.com/room-badge/vip/' + Chat.info.channel + '/4';
-                        }
-                    });
+                GetJson('https://api.frankerfacez.com/v1/_room/id/' + encodeURIComponent(Chat.info.channelID)).then(function(res) {
+                    if (res.room.moderator_badge) {
+                        Chat.info.badges['moderator:1'] = 'https://cdn.frankerfacez.com/room-badge/mod/' + Chat.info.channel + '/4/rounded';
+                    }
+                    if (res.room.vip_badge) {
+                        Chat.info.badges['vip:1'] = 'https://cdn.frankerfacez.com/room-badge/vip/' + Chat.info.channel + '/4';
+                    }
                 });
             });
+        });
 
-            if (!Chat.info.hideBadges) {
-                $.getJSON('https://api.ffzap.com/v1/supporters')
-                    .done(function(res) {
-                        Chat.info.ffzapBadges = res;
-                    })
-                    .fail(function() {
-                        Chat.info.ffzapBadges = [];
-                    });
-                $.getJSON('https://api.betterttv.net/3/cached/badges')
-                    .done(function(res) {
-                        Chat.info.bttvBadges = res;
-                    })
-                    .fail(function() {
-                        Chat.info.bttvBadges = [];
-                    });
+        if (!Chat.info.hideBadges) {
+            GetJson('https://api.ffzap.com/v1/supporters')
+                .then(function(res) {
+                    Chat.info.ffzapBadges = res;
+                })
+                .catch(function() {
+                    Chat.info.ffzapBadges = [];
+                });
 
-                $.getJSON('https://api.7tv.app/v2/badges?user_identifier=login')
-                    .done(function(res) {
-                        Chat.info.seventvBadges = res.badges;
-                    })
-                    .fail(function() {
-                        Chat.info.seventvBadges = [];
-                    });
+            GetJson('https://api.betterttv.net/3/cached/badges')
+                .then(function(res) {
+                    Chat.info.bttvBadges = res;
+                })
+                .catch(function() {
+                    Chat.info.bttvBadges = [];
+                });
 
-                $.getJSON('https://api.chatterino.com/badges')
-                    .done(function(res) {
-                        Chat.info.chatterinoBadges = res.badges;
-                    })
-                    .fail(function() {
-                        Chat.info.chatterinoBadges = [];
-                    });
-            }
+            GetJson('https://api.7tv.app/v2/badges?user_identifier=login')
+                .then(function(res) {
+                    Chat.info.seventvBadges = res.badges;
+                })
+                .catch(function() {
+                    Chat.info.seventvBadges = [];
+                });
 
-            TwitchAPI("/user-badges").done(function(res) {
-                Chat.info.customBadges = res
-            });
+            GetJson('https://api.chatterino.com/badges')
+                .then(function(res) {
+                    Chat.info.chatterinoBadges = res.badges;
+                })
+                .catch(function() {
+                    Chat.info.chatterinoBadges = [];
+                });
+        }
 
-            // Load cheers images
-            TwitchAPI("/cheermotes?broadcaster_id=" + Chat.info.channelID).done(function(res) {
-                res.data.forEach(action => {
-                    Chat.info.cheers[action.prefix] = {}
-                    action.tiers.forEach(tier => {
-                        Chat.info.cheers[action.prefix][tier.min_bits] = {
-                            image: tier.images.dark.animated['4'],
-                            color: tier.color
-                        };
-                    });
+        TwitchAPI("/user-badges").then(function(res) {
+            Chat.info.customBadges = res
+        });
+
+        // Load cheers images
+        {
+            let res = await TwitchAPI("/cheermotes?broadcaster_id=" + Chat.info.channelID)
+            res.data.forEach(action => {
+                Chat.info.cheers[action.prefix] = {}
+                action.tiers.forEach(tier => {
+                    Chat.info.cheers[action.prefix][tier.min_bits] = {
+                        image: tier.images.dark.animated['4'],
+                        color: tier.color
+                    };
                 });
             });
+        }
 
-            let wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
-            let socket = new ReconnectingWebSocket(`${wsProtocol}://${window.location.host}/color`, 'irc', { reconnectInterval: 2000 });
-            socket.onmessage = (e) => {
-                let data = JSON.parse(e.data)
+        let wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
+        let socket = new ReconnectingWebSocket(`${wsProtocol}://${window.location.host}/color`, 'irc', { reconnectInterval: 2000 });
+        socket.onmessage = (e) => {
+            let data = JSON.parse(e.data)
 
-                Chat.info.color = data.color
+            Chat.info.color = data.color
 
-                Chat.updateCssVariables()
-            }
+            Chat.updateCssVariables()
+        }
 
-            Chat.updateCssVariables();
+        Chat.updateCssVariables();
 
-            callback(true);
-        })
+        var title = $(document).prop('title');
+        $(document).prop('title', title + Chat.info.channel);
     },
 
     updateCssVariables: function () {
@@ -262,65 +266,66 @@ Chat = {
         }
     }, 200),
 
-    loadUserBadges: function(nick, userId) {
+    loadUserBadges: async function(nick, userId) {
         Chat.info.userBadges[nick] = [];
-        $.getJSON('https://api.frankerfacez.com/v1/user/' + nick).always(function(res) {
-            if (res.badges) {
-                Object.entries(res.badges).forEach(badge => {
-                    var userBadge = {
-                        description: badge[1].title,
-                        url: 'https:' + badge[1].urls['4'],
-                        color: badge[1].color
-                    };
-                    if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
-                });
+
+        let res = await GetJson('https://api.frankerfacez.com/v1/user/' + nick)
+
+        if (res.badges) {
+            Object.entries(res.badges).forEach(badge => {
+                var userBadge = {
+                    description: badge[1].title,
+                    url: 'https:' + badge[1].urls['4'],
+                    color: badge[1].color
+                };
+                if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
+            });
+        }
+        Chat.info.ffzapBadges.forEach(user => {
+            if (user.id.toString() === userId) {
+                var color = '#755000';
+                if (user.tier == 2) color = (user.badge_color || '#755000');
+                else if (user.tier == 3) {
+                    if (user.badge_is_colored == 0) color = (user.badge_color || '#755000');
+                    else color = false;
+                }
+                var userBadge = {
+                    description: 'FFZ:AP Badge',
+                    url: 'https://api.ffzap.com/v1/user/badge/' + userId + '/3',
+                    color: color
+                };
+                if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
             }
-            Chat.info.ffzapBadges.forEach(user => {
-                if (user.id.toString() === userId) {
-                    var color = '#755000';
-                    if (user.tier == 2) color = (user.badge_color || '#755000');
-                    else if (user.tier == 3) {
-                        if (user.badge_is_colored == 0) color = (user.badge_color || '#755000');
-                        else color = false;
-                    }
+        });
+        Chat.info.bttvBadges.forEach(user => {
+            if (user.name === nick) {
+                var userBadge = {
+                    description: user.badge.description,
+                    url: user.badge.svg
+                };
+                if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
+            }
+        });
+        Chat.info.seventvBadges.forEach(badge => {
+            badge.users.forEach(user => {
+                if (user === nick) {
                     var userBadge = {
-                        description: 'FFZ:AP Badge',
-                        url: 'https://api.ffzap.com/v1/user/badge/' + userId + '/3',
-                        color: color
+                        description: badge.tooltip,
+                        url: badge.urls[2][1]
                     };
                     if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
                 }
             });
-            Chat.info.bttvBadges.forEach(user => {
-                if (user.name === nick) {
+        });
+        Chat.info.chatterinoBadges.forEach(badge => {
+            badge.users.forEach(user => {
+                if (user === userId) {
                     var userBadge = {
-                        description: user.badge.description,
-                        url: user.badge.svg
+                        description: badge.tooltip,
+                        url: badge.image3 || badge.image2 || badge.image1
                     };
                     if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
                 }
-            });
-            Chat.info.seventvBadges.forEach(badge => {
-                badge.users.forEach(user => {
-                    if (user === nick) {
-                        var userBadge = {
-                            description: badge.tooltip,
-                            url: badge.urls[2][1]
-                        };
-                        if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
-                    }
-                });
-            });
-            Chat.info.chatterinoBadges.forEach(badge => {
-                badge.users.forEach(user => {
-                    if (user === userId) {
-                        var userBadge = {
-                            description: badge.tooltip,
-                            url: badge.image3 || badge.image2 || badge.image1
-                        };
-                        if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
-                    }
-                });
             });
         });
     },
@@ -532,89 +537,98 @@ Chat = {
     },
 
     connect: function() {
-        Chat.load(function() {
-            var title = $(document).prop('title');
-            $(document).prop('title', title + Chat.info.channel);
-    
-            console.log('jChat: Connecting to IRC server...');
-            var socket = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', 'irc', { reconnectInterval: 2000 });
+        console.log('jChat: Connecting to IRC server...');
+        var socket = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', 'irc', { reconnectInterval: 2000 });
 
-            socket.onopen = function() {
-                console.log('jChat: Connected');
-                socket.send('PASS blah\r\n');
-                socket.send('NICK justinfan' + Math.floor(Math.random() * 99999) + '\r\n');
-                socket.send('CAP REQ :twitch.tv/commands twitch.tv/tags\r\n');
-                socket.send('JOIN #' + Chat.info.channel + '\r\n');
-            };
+        socket.onopen = function() {
+            console.log('jChat: Connected');
+            socket.send('PASS blah\r\n');
+            socket.send('NICK justinfan' + Math.floor(Math.random() * 99999) + '\r\n');
+            socket.send('CAP REQ :twitch.tv/commands twitch.tv/tags\r\n');
+            socket.send('JOIN #' + Chat.info.channel + '\r\n');
+        };
 
-            socket.onclose = function() {
-                console.log('jChat: Disconnected');
-            };
+        socket.onclose = function() {
+            console.log('jChat: Disconnected');
+        };
 
-            socket.onmessage = function(data) {
-                data.data.split('\r\n').forEach(line => {
-                    if (!line) return;
-                    var message = window.parseIRC(line);
-                    if (!message.command) return;
+        socket.onmessage = function(data) {
+            data.data.split('\r\n').forEach(line => {
+                if (!line) return;
+                var message = window.parseIRC(line);
+                if (!message.command) return;
 
-                    switch (message.command) {
-                        case "PING":
-                            socket.send('PONG ' + message.params[0]);
-                            return;
-                        case "JOIN":
-                            console.log('jChat: Joined channel #' + Chat.info.channel);
-                            return;
-                        case "CLEARMSG":
-                            if (message.tags) Chat.clearMessage(message.tags['target-msg-id']);
-                            return;
-                        case "CLEARCHAT":
-                            if (message.params[1]) Chat.clearChat(message.params[1]);
-                            return;
-                        case "PRIVMSG":
-                            if (message.params[0] !== '#' + Chat.info.channel || !message.params[1]) return;
-                            var nick = message.prefix.split('@')[0].split('!')[0];
+                switch (message.command) {
+                    case "PING":
+                        socket.send('PONG ' + message.params[0]);
+                        return;
+                    case "JOIN":
+                        console.log('jChat: Joined channel #' + Chat.info.channel);
+                        return;
+                    case "CLEARMSG":
+                        if (message.tags) Chat.clearMessage(message.tags['target-msg-id']);
+                        return;
+                    case "CLEARCHAT":
+                        if (message.params[1]) Chat.clearChat(message.params[1]);
+                        return;
+                    case "PRIVMSG":
+                        if (message.params[0] !== '#' + Chat.info.channel || !message.params[1]) return;
+                        var nick = message.prefix.split('@')[0].split('!')[0];
 
-                            if (message.params[1].toLowerCase() === "!refreshoverlay" && typeof(message.tags.badges) === 'string') {
-                                var flag = false;
-                                message.tags.badges.split(',').forEach(badge => {
-                                    badge = badge.split('/');
-                                    if (badge[0] === "moderator" || badge[0] === "broadcaster") {
-                                        flag = true;
-                                        return;
-                                    }
-                                });
-                                if (flag) {
-                                    Chat.loadEmotes(Chat.info.channelID);
-                                    console.log('jChat: Refreshing emotes...');
+                        if (message.params[1].toLowerCase() === "!refreshoverlay" && typeof(message.tags.badges) === 'string') {
+                            var flag = false;
+                            message.tags.badges.split(',').forEach(badge => {
+                                badge = badge.split('/');
+                                if (badge[0] === "moderator" || badge[0] === "broadcaster") {
+                                    flag = true;
                                     return;
                                 }
+                            });
+                            if (flag) {
+                                Chat.loadEmotes(Chat.info.channelID);
+                                console.log('jChat: Refreshing emotes...');
+                                return;
                             }
+                        }
 
-                            if (Chat.info.hideCommands) {
-                                if (/^!.+/.test(message.params[1])) return;
-                            }
+                        if (Chat.info.hideCommands) {
+                            if (/^!.+/.test(message.params[1])) return;
+                        }
 
-                            if (!Chat.info.showBots) {
-                                if (Chat.info.bots.includes(nick)) return;
-                            }
+                        if (!Chat.info.showBots) {
+                            if (Chat.info.bots.includes(nick)) return;
+                        }
 
-                            if (Chat.info.blockedUsers) {
-                                if (Chat.info.blockedUsers.includes(nick)) return;
-                            }
+                        if (Chat.info.blockedUsers) {
+                            if (Chat.info.blockedUsers.includes(nick)) return;
+                        }
 
-                            if (!Chat.info.hideBadges) {
-                                if (Chat.info.bttvBadges && Chat.info.seventvBadges && Chat.info.chatterinoBadges && Chat.info.ffzapBadges && !Chat.info.userBadges[nick]) Chat.loadUserBadges(nick, message.tags['user-id']);
-                            }
+                        if (!Chat.info.hideBadges) {
+                            if (Chat.info.bttvBadges && Chat.info.seventvBadges && Chat.info.chatterinoBadges && Chat.info.ffzapBadges && !Chat.info.userBadges[nick]) Chat.loadUserBadges(nick, message.tags['user-id']);
+                        }
 
-                            Chat.write(nick, message.tags, message.params[1]);
-                            return;
-                    }
-                });
-            };
-        });
+                        Chat.write(nick, message.tags, message.params[1]);
+                        return;
+                }
+            });
+        };
     }
 };
 
 $(document).ready(function() {
-    Chat.connect();
+    (async function() {
+        for (;;) {
+            try {
+                console.log('Loading...')
+                await Chat.load()
+                console.log('Loaded successfully')
+                break
+            } catch (e) {
+                console.error('Loading failed', e)
+                await new Promise((resolve) => setTimeout(resolve, 5000))
+            }
+        }
+
+        Chat.connect();
+    })()
 });
