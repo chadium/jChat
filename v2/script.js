@@ -22,7 +22,7 @@ Chat = {
         animate: ('animate' in $.QueryString ? ($.QueryString.animate.toLowerCase() === 'true') : false),
         showBots: ('bots' in $.QueryString ? ($.QueryString.bots.toLowerCase() === 'true') : false),
         hideCommands: ('hide_commands' in $.QueryString ? ($.QueryString.hide_commands.toLowerCase() === 'true') : false),
-        hideBadges: ('hide_badges' in $.QueryString ? ($.QueryString.hide_badges.toLowerCase() === 'true') : false),
+        hideBadges: ('hide_badges' in $.QueryString ? ($.QueryString.hide_badges.toLowerCase() === 'true') : true),
         fade: ('fade' in $.QueryString ? parseInt($.QueryString.fade) : false),
         fontSize: ('font_size' in $.QueryString ? parseInt($.QueryString.font_size) : null),
         color: '#000000',
