@@ -536,7 +536,7 @@ Chat = {
         }, 200);
     },
 
-    connect: function() {
+    connectTwitch: function() {
         console.log('jChat: Connecting to IRC server...');
         var socket = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', 'irc', { reconnectInterval: 2000 });
 
@@ -612,6 +612,80 @@ Chat = {
                 }
             });
         };
+    },
+
+    connectKick: function() {
+        console.log('jChat: Connecting to Kick chat...');
+        var socket = new ReconnectingWebSocket(
+            'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
+            'irc',
+            { reconnectInterval: 2000 }
+        );
+
+        // Remember to ping.
+        //{"event":"pusher:ping","data":{}}
+
+        socket.onopen = function() {
+            socket.send(JSON.stringify({
+                "event": "pusher:subscribe",
+                "data": {
+                    "auth": "",
+                    "channel": "channel.1402708"
+                }
+            }))
+            socket.send(JSON.stringify({
+                "event": "pusher:subscribe",
+                "data": {
+                    "auth": "",
+                    "channel": "chatrooms.1395556"
+                }
+            }))
+        };
+
+        socket.onclose = function() {
+            console.log('jChat: Disconnected');
+        };
+
+        socket.onmessage = function(e) {
+            let payload = JSON.parse(e.data)
+
+            switch (payload.event) {
+                case "App\\Events\\ChatMessageSentEvent": {
+                    let data = JSON.parse(payload.data)
+
+                    let username = data.user.username
+                    let message = data.message.message
+                    let info = {
+                        id: data.message.id,
+                        color: undefined,
+                        "display-name": undefined,
+                        bits: undefined,
+                        emotes: undefined
+                    }
+
+                    if (username === 'weloveshortbyte') {
+                        info.color = 'pink'
+                        info["display-name"] = '69daddy420'
+                    } else if (username == 'Taderz') {
+                    }
+
+                    if (Chat.info.hideCommands) {
+                        if (/^!.+/.test(message)) return;
+                    }
+
+                    if (!Chat.info.showBots) {
+                        if (Chat.info.bots.includes(username)) return;
+                    }
+
+                    if (Chat.info.blockedUsers) {
+                        if (Chat.info.blockedUsers.includes(username)) return;
+                    }
+
+                    Chat.write(username, info, message);
+                    break;
+                }
+            }
+        };
     }
 };
 
@@ -629,6 +703,7 @@ $(document).ready(function() {
             }
         }
 
-        Chat.connect();
+        //Chat.connectTwitch();
+        Chat.connectKick();
     })()
 });
