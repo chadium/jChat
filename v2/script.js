@@ -473,6 +473,18 @@ Chat = {
 
             message = escapeHtml(message);
 
+            if (info.parseKickEmotes) {
+                let regexp = /\[emote:(.+?):.+?\]/g
+
+                for (let entry of message.matchAll(regexp)) {
+                    let replacementString = entry[0]
+                    let id = entry[1]
+                    let url = `https://files.kick.com/emotes/${encodeURIComponent(id)}/fullsize`
+                    let shit = `<img class="emote" src="${url}" />`;
+                    message = message.replaceAll(replacementString, shit);
+                }
+            }
+
             if (info.bits && parseInt(info.bits) > 0) {
                 var bits = parseInt(info.bits);
                 var parsed = false;
@@ -660,13 +672,15 @@ Chat = {
                         color: undefined,
                         "display-name": undefined,
                         bits: undefined,
-                        emotes: undefined
+                        emotes: undefined,
+                        parseKickEmotes: true
                     }
 
                     if (username === 'weloveshortbyte') {
                         info.color = 'pink'
                         info["display-name"] = '69daddy420'
-                    } else if (username == 'Taderz') {
+                    } else if (username == 'bitcrusher') {
+                        info.color = 'pink'
                     }
 
                     if (Chat.info.hideCommands) {
@@ -703,7 +717,7 @@ $(document).ready(function() {
             }
         }
 
-        //Chat.connectTwitch();
+        Chat.connectTwitch();
         Chat.connectKick();
     })()
 });
