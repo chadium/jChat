@@ -404,6 +404,11 @@ Chat = {
             $userBadge.addClass('user_badge');
             var $userCoolShape = $('<span></span>');
             $userCoolShape.addClass('user_cool_shape');
+//             var $userCoolShape = $(`
+// <svg class="user_cool_shape" viewBox="0 0 100 100">
+//     <path d="M 0 0 L 100 0 L 0 100 Z" fill=""/>
+// </svg>
+//             `);
 
             // Custom badges.
             if (Chat.info.customBadges) {

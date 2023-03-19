@@ -63,6 +63,14 @@ body {
     );
 }
 
+/* .user_cool_shape path {
+    fill: var(--daniel-user-background) linear-gradient(
+        rgba(255, 255, 255, 0) 80%,
+        rgba(0, 0, 0, 0.2)
+    );
+    background: var(--daniel-user-background) url(#svgTestGradient);
+} */
+
 .user_badge {
     margin-left: -1ex;
     width: 2em;
@@ -98,9 +106,9 @@ body {
 }
 
 .user_cool_shape {
-    width: 1.5em;
+    width: var(--daniel-chat-line-height);
     height: var(--daniel-chat-line-height);
-    clip-path: polygon(-1px 100%, -1% 0%, 100% 0);
+    clip-path: polygon(0 100%, 0% 0%, 100% 0);
     display: inline-block;
     vertical-align: bottom;
 }
