@@ -1,8 +1,10 @@
 import express from 'express'
 import cors from 'cors'
+import http from 'http'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import { twitchApiRequest } from "../../../../services/twitch-api-request/src/index.mjs"
 import { OAuthSession } from "../../../../services/oauth-local/src/index.mjs"
+import { HttpProxy } from '../../../common/src/http-proxy.mjs'
 import { twentyEightApiFetch, TwentyEightApiFetchServerError, TwentyEightApiFetchClientError } from '../../../../services/twenty-eight-api-fetch/src/index.mjs'
 import "./dotenv.mjs"
 
@@ -51,8 +53,8 @@ let twitchChannelId = await twitchUserId(session, process.env.TWITCH_CHANNEL)
 let kickChannelInfo = await kickUserInfo(process.env.KICK_CHANNEL)
 
 const app = express()
-
-const port = process.env.PORT
+const server = http.createServer(app).listen(process.env.PORT)
+const httpProxy = new HttpProxy({ server })
 
 app.use(express.json());
 app.use(cors());
@@ -64,6 +66,11 @@ function asyncHandler(handler) {
     })
   }
 }
+
+httpProxy.websocketProxy({
+  path: '/kick/chat',
+  target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false'
+})
 
 app.get('/info', asyncHandler(async (req, res) => {
   res.json({
@@ -119,8 +126,4 @@ app.use(function (err, req, res, next) {
     name: 'UnknownServerError',
     message: 'Unknown Server error.'
   })
-})
-
-app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}`)
 })

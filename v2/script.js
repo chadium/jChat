@@ -40,7 +40,12 @@ Chat = {
         cheers: {},
         lines: [],
         blockedUsers: ('block' in $.QueryString ? $.QueryString.block.toLowerCase().split(',') : false),
-        bots: ['streamelements', 'streamlabs', 'nightbot', 'moobot', 'fossabot']
+        bots: ['streamelements', 'streamlabs', 'nightbot', 'moobot', 'fossabot'],
+
+        kick: {
+            channelName: null,
+            chatroomId: null
+        }
     },
 
     style: null,
@@ -109,11 +114,14 @@ Chat = {
         {
             let res = await GetJson("/info")
             if (Chat.info.channel === null) {
-                Chat.info.channel = res.channelName;
+                Chat.info.channel = res.twitch.channelName;
             }
 
-            Chat.info.channelID = res.channelId;
+            Chat.info.channelID = res.twitch.channelId;
             Chat.loadEmotes(Chat.info.channelID);
+
+            Chat.info.kick.channelName = res.kick.channelName
+            Chat.info.kick.chatroomId = res.kick.chatroomId
         }
 
         // Load CSS
@@ -634,7 +642,7 @@ Chat = {
     connectKick: function() {
         console.log('jChat: Connecting to Kick chat...');
         var socket = new ReconnectingWebSocket(
-            'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
+            buildLocalWebsocketUrl('/kick/chat'),
             'irc',
             { reconnectInterval: 2000 }
         );
@@ -647,14 +655,7 @@ Chat = {
                 "event": "pusher:subscribe",
                 "data": {
                     "auth": "",
-                    "channel": "channel.1402708"
-                }
-            }))
-            socket.send(JSON.stringify({
-                "event": "pusher:subscribe",
-                "data": {
-                    "auth": "",
-                    "channel": "chatrooms.1395556"
+                    "channel": `chatrooms.${Chat.info.kick.chatroomId}`
                 }
             }))
         };

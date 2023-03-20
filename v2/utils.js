@@ -18,6 +18,26 @@ function escapeHtml(message) {
         .replace(/(>)(?!\()/g, "&gt;");
 }
 
+function buildLocalWebsocketUrl(path) {
+    if (!path.startsWith('/')) {
+        throw Error('Path must start with a slash.')
+    }
+
+    let url = ''
+
+    if (location.protocol === 'http:') {
+        url += 'ws://'
+    } else {
+        url += 'wss://'
+    }
+
+    url += location.host
+
+    url += path
+
+    return url
+}
+
 function GetJson(url, {
     timeout = 10000
 } = {}) {
