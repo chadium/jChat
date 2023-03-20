@@ -6,7 +6,7 @@ import { OAuthSession } from "../../../../services/oauth-local/src/index.mjs"
 import { twentyEightApiFetch, TwentyEightApiFetchServerError, TwentyEightApiFetchClientError } from '../../../../services/twenty-eight-api-fetch/src/index.mjs'
 import "./dotenv.mjs"
 
-async function userId(session, login) {
+async function twitchUserId(session, login) {
   console.log(`Retrieving id of ${login}`)
 
   let response = await session.try(({ accessToken, clientId }) => twitchApiRequest({
@@ -25,6 +25,17 @@ async function userId(session, login) {
   return response.data.data[0].id
 }
 
+async function kickUserInfo(username) {
+  let { data } = await twentyEightApiFetch({
+    url: `${process.env.KICK_FORBIDDEN_HTTP_API_PREFIX}/channel/id`,
+    query: {
+      channel: username
+    }
+  })
+
+  return data
+}
+
 let session = new OAuthSession({
   id: 'jchat-fork',
   codeUrl: 'https://id.twitch.tv/oauth2/authorize',
@@ -36,7 +47,8 @@ let session = new OAuthSession({
 
 await session.start()
 
-let broadcasterId = await userId(session, process.env.TWITCH_CHANNEL)
+let twitchChannelId = await twitchUserId(session, process.env.TWITCH_CHANNEL)
+let kickChannelInfo = await kickUserInfo(process.env.KICK_CHANNEL)
 
 const app = express()
 
@@ -55,8 +67,15 @@ function asyncHandler(handler) {
 
 app.get('/info', asyncHandler(async (req, res) => {
   res.json({
-    channelName: process.env.TWITCH_CHANNEL,
-    channelId: broadcasterId,
+    twitch: {
+      channelName: process.env.TWITCH_CHANNEL,
+      channelId: twitchChannelId,
+    },
+    kick: {
+      channelName: process.env.KICK_CHANNEL,
+      channelId: kickChannelInfo.channelId,
+      chatroomId: kickChannelInfo.chatroomId,
+    }
   })
 }))
 
