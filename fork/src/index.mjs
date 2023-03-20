@@ -81,9 +81,6 @@ app.get('/info', asyncHandler(async (req, res) => {
   })
 }))
 
-app.use('/kick/chat', createProxyMiddleware({ target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false', changeOrigin: true, ws: true }))
-app.use('/color', createProxyMiddleware(`${process.env.CENTRAL_WS_API_PREFIX}/color`));
-
 app.use('/fork/customcss.css', express.static('./customcss.css'))
 app.use('/v2', express.static('../v2'))
 app.use('/img', express.static('../img'))
@@ -114,6 +111,13 @@ app.get('/cheermotes', asyncHandler(async (req, res) => {
 
   res.json(response.data)
 }))
+
+app.use('/kick/chat', createProxyMiddleware({
+  target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
+  changeOrigin: true,
+  ws: true
+}))
+app.use('/color', createProxyMiddleware(`${process.env.CENTRAL_WS_API_PREFIX}/color`));
 
 app.use(function (err, req, res, next) {
   console.error(err.stack)
