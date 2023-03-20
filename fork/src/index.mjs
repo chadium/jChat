@@ -67,11 +67,6 @@ function asyncHandler(handler) {
   }
 }
 
-httpProxy.websocketProxy({
-  path: '/kick/chat',
-  target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false'
-})
-
 app.get('/info', asyncHandler(async (req, res) => {
   res.json({
     twitch: {
@@ -86,6 +81,7 @@ app.get('/info', asyncHandler(async (req, res) => {
   })
 }))
 
+app.use('/kick/chat', createProxyMiddleware({ target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false', changeOrigin: true, ws: true }))
 app.use('/color', createProxyMiddleware(`${process.env.CENTRAL_WS_API_PREFIX}/color`));
 
 app.use('/fork/customcss.css', express.static('./customcss.css'))
