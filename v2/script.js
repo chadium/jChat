@@ -213,8 +213,7 @@ Chat = {
             });
         }
 
-        let wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws'
-        let socket = new ReconnectingWebSocket(`${wsProtocol}://${window.location.host}/color`, 'irc', { reconnectInterval: 2000 });
+        let socket = new ReconnectingWebSocket(buildLocalWebsocketUrl('/color'), 'irc', { reconnectInterval: 2000 });
         socket.onmessage = (e) => {
             let data = JSON.parse(e.data)
 
@@ -642,7 +641,7 @@ Chat = {
     connectKick: function() {
         console.log('jChat: Connecting to Kick chat...');
         var socket = new ReconnectingWebSocket(
-            buildLocalWebsocketUrl('/kick/chat'),
+            'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
             'irc',
             { reconnectInterval: 2000 }
         );
