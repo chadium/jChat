@@ -112,12 +112,17 @@ app.get('/cheermotes', asyncHandler(async (req, res) => {
   res.json(response.data)
 }))
 
-app.use('/kick/chat', createProxyMiddleware({
+app.use(createProxyMiddleware({
+  pathFilter: '/kick/chat',
   target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
   changeOrigin: true,
-  ws: true
+  ws: true,
 }))
-app.use('/color', createProxyMiddleware(`${process.env.CENTRAL_WS_API_PREFIX}/color`));
+app.use(createProxyMiddleware({
+  pathFilter: '/color',
+  target: `${process.env.CENTRAL_WS_API_PREFIX}/color`,
+  ws: true,
+}))
 
 app.use(function (err, req, res, next) {
   console.error(err.stack)
