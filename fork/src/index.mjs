@@ -119,6 +119,14 @@ app.get('/custom-colors', asyncHandler(async (req, res) => {
   res.json(response.data)
 }))
 
+app.get('/kick/assets/urls', asyncHandler(async (req, res) => {
+  let { data } = await twentyEightApiFetch({
+    url: `${process.env.KICK_FORBIDDEN_HTTP_API_PREFIX}/assets/urls`
+  })
+
+  res.json(data)
+}))
+
 app.get('/user-badges', asyncHandler(async (req, res) => {
   let response = await twentyEightApiFetch({
     url: `${process.env.CENTRAL_HTTP_API_PREFIX}/custom-badges/twitch`,

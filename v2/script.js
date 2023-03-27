@@ -45,6 +45,8 @@ Chat = {
         colors: {},
 
         kick: {
+            assetUrl: null,
+            cloudfrontUrl: null,
             channelName: null,
             chatroomId: null,
             colors: {}
@@ -103,6 +105,18 @@ Chat = {
         });
     },
 
+    async loadKickAssetUrls() {
+        let data = await GetJson('/kick/assets/urls')
+
+        if (data.assetUrl) {
+            Chat.info.kick.assetUrl = data.assetUrl
+        }
+
+        if (data.cloudfrontUrl) {
+            Chat.info.kick.cloudfrontUrl = data.cloudfrontUrl
+        }
+    },
+
     load: async function(callback) {
         if (Chat.info.fontSize === null) {
             // I guess I'll have to calculate based on the width of the
@@ -127,6 +141,7 @@ Chat = {
             Chat.info.kick.chatroomId = res.kick.chatroomId
         }
 
+        Chat.loadKickAssetUrls();
         Chat.loadCustomColors();
 
         let customColorsSocket = new ReconnectingWebSocket(buildLocalWebsocketUrl('/custom-colors'), null, { reconnectInterval: 2000 });
@@ -534,7 +549,17 @@ Chat = {
                 for (let entry of message.matchAll(regexp)) {
                     let replacementString = entry[0]
                     let id = entry[1]
-                    let url = `https://files.kick.com/emotes/${encodeURIComponent(id)}/fullsize`
+                    let url = `${Chat.info.kick.cloudfrontUrl}/emotes/${encodeURIComponent(id)}/fullsize`
+                    let shit = `<img class="emote" src="${url}" />`;
+                    message = message.replaceAll(replacementString, shit);
+                }
+
+                let regexp2 = /\[emoji:(.+?)\]/g
+
+                for (let entry of message.matchAll(regexp2)) {
+                    let replacementString = entry[0]
+                    let id = entry[1]
+                    let url = `${Chat.info.kick.assetUrl}images/emojis/${encodeURIComponent(id)}.png`
                     let shit = `<img class="emote" src="${url}" />`;
                     message = message.replaceAll(replacementString, shit);
                 }
