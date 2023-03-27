@@ -58,7 +58,7 @@ const httpProxy = new HttpProxy({ server })
 
 httpProxy.websocketProxy({
   path: '/kick/chat',
-  target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
+  target: `${process.env.KICK_FORBIDDEN_WS_API_PREFIX}/chat?channel=${encodeURIComponent(process.env.KICK_CHANNEL)}`,
 })
 
 httpProxy.websocketProxy({
@@ -97,6 +97,22 @@ app.use('/img', express.static('../img'))
 app.use('/styles', express.static('../styles'))
 app.use('/settings.js', express.static('../settings.js'))
 app.use('/utils.js', express.static('../utils.js'))
+
+app.get('/custom-colors', asyncHandler(async (req, res) => {
+  let { cursor, direction } = JSON.parse(req.query.d)
+
+  let response = await twentyEightApiFetch({
+    url: `${process.env.CENTRAL_HTTP_API_PREFIX}/overlay/chat/user/color/list`,
+    queryData: {
+      cursor,
+      limit: 100,
+      direction,
+      sort: [['id', 1]]
+    }
+  })
+
+  res.json(response.data)
+}))
 
 app.get('/user-badges', asyncHandler(async (req, res) => {
   let response = await twentyEightApiFetch({

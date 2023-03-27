@@ -65,3 +65,26 @@ function TwitchAPI(url) {
         timeout: 5000
     })
 }
+
+const platform = {
+    TWITCH: 1,
+    KICK: 2
+}
+
+async function webpaginationGetAll(cb) {
+    let data = []
+    let cursor = undefined
+
+    for (;;) {
+        let result = await cb({ cursor })
+
+        if (!result.cursor) {
+            break
+        }
+
+        data.push(result.data)
+        cursor = result.cursor
+    }
+
+    return data.flat()
+}

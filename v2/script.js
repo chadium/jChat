@@ -25,7 +25,7 @@ Chat = {
         hideBadges: ('hide_badges' in $.QueryString ? ($.QueryString.hide_badges.toLowerCase() === 'true') : true),
         fade: ('fade' in $.QueryString ? parseInt($.QueryString.fade) : false),
         fontSize: ('font_size' in $.QueryString ? parseInt($.QueryString.font_size) : null),
-        color: '#000000',
+        primaryColor: '#000000',
         font: ('font' in $.QueryString ? parseInt($.QueryString.font) : 0),
         stroke: ('stroke' in $.QueryString ? parseInt($.QueryString.stroke) : false),
         smallCaps: ('small_caps' in $.QueryString ? ($.QueryString.small_caps.toLowerCase() === 'true') : false),
@@ -42,9 +42,12 @@ Chat = {
         blockedUsers: ('block' in $.QueryString ? $.QueryString.block.toLowerCase().split(',') : false),
         bots: ['streamelements', 'streamlabs', 'nightbot', 'moobot', 'fossabot'],
 
+        colors: {},
+
         kick: {
             channelName: null,
-            chatroomId: null
+            chatroomId: null,
+            colors: {}
         }
     },
 
@@ -123,6 +126,8 @@ Chat = {
             Chat.info.kick.channelName = res.kick.channelName
             Chat.info.kick.chatroomId = res.kick.chatroomId
         }
+
+        Chat.loadCustomColors();
 
         // Load CSS
         let font = fonts[Chat.info.font];
@@ -217,7 +222,9 @@ Chat = {
         socket.onmessage = (e) => {
             let data = JSON.parse(e.data)
 
-            Chat.info.color = data.color
+            console.log('COLOR', data)
+
+            Chat.info.primaryColor = data.color
 
             Chat.updateCssVariables()
         }
@@ -228,9 +235,31 @@ Chat = {
         $(document).prop('title', title + Chat.info.channel);
     },
 
+    loadCustomColors: async function () {
+        let colors = await webpaginationGetAll(async ({ cursor }) => {
+            let data = await GetJson('/custom-colors?d=' + encodeURIComponent(JSON.stringify({
+                direction: 1,
+                cursor,
+            })))
+
+            return {
+                data: data.resources,
+                cursor: data.cursor
+            }
+        })
+
+        for (let entry of colors) {
+            if (entry.platformId === platform.KICK) {
+                Chat.info.kick.colors[entry.username] = entry.color
+            } else if (entry.platformId === platform.TWITCH) {
+                Chat.info.colors[entry.username] = entry.color
+            }
+        }
+    },
+
     updateCssVariables: function () {
         Chat.style.textContent = `:root {
-            --daniel-bg-color: ${Chat.info.color};
+            --daniel-bg-color: ${Chat.info.primaryColor};
             --daniel-chat-font-size: ${Chat.info.fontSize}px;
             --daniel-chat-line-height: ${Math.floor(Chat.info.fontSize * 1.5)}px;
         }`
@@ -562,7 +591,11 @@ Chat = {
 
     connectTwitch: function() {
         console.log('jChat: Connecting to IRC server...');
-        var socket = new ReconnectingWebSocket('wss://irc-ws.chat.twitch.tv', 'irc', { reconnectInterval: 2000 });
+        var socket = new ReconnectingWebSocket(
+            'wss://irc-ws.chat.twitch.tv',
+            'irc',
+            { reconnectInterval: 2000 }
+        );
 
         socket.onopen = function() {
             console.log('jChat: Connected');
@@ -641,51 +674,33 @@ Chat = {
     connectKick: function() {
         console.log('jChat: Connecting to Kick chat...');
         var socket = new ReconnectingWebSocket(
-            'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
-            'irc',
+            buildLocalWebsocketUrl('/kick/chat'),
+            null,
             { reconnectInterval: 2000 }
         );
 
-        // Remember to ping.
-        //{"event":"pusher:ping","data":{}}
-
         socket.onopen = function() {
-            socket.send(JSON.stringify({
-                "event": "pusher:subscribe",
-                "data": {
-                    "auth": "",
-                    "channel": `chatrooms.${Chat.info.kick.chatroomId}`
-                }
-            }))
+            console.log('jChat: Connected to kick.');
         };
 
         socket.onclose = function() {
-            console.log('jChat: Disconnected');
+            console.log('jChat: Disconnected from kick.');
         };
 
         socket.onmessage = function(e) {
             let payload = JSON.parse(e.data)
 
-            switch (payload.event) {
-                case "App\\Events\\ChatMessageSentEvent": {
-                    let data = JSON.parse(payload.data)
-
-                    let username = data.user.username
-                    let message = data.message.message
+            switch (payload.type) {
+                case "message": {
+                    let username = payload.username
+                    let message = payload.message
                     let info = {
-                        id: data.message.id,
-                        color: undefined,
+                        id: payload.id,
+                        color: Chat.info.kick.colors[username],
                         "display-name": undefined,
                         bits: undefined,
                         emotes: undefined,
                         parseKickEmotes: true
-                    }
-
-                    if (username === 'weloveshortbyte') {
-                        info.color = 'pink'
-                        info["display-name"] = '69daddy420'
-                    } else if (username == 'bitcrusher') {
-                        info.color = 'pink'
                     }
 
                     if (Chat.info.hideCommands) {
