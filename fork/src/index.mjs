@@ -56,6 +56,16 @@ const app = express()
 const server = http.createServer(app).listen(process.env.PORT)
 const httpProxy = new HttpProxy({ server })
 
+httpProxy.websocketProxy({
+  path: '/kick/chat',
+  target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
+})
+
+httpProxy.websocketProxy({
+  path: '/color',
+  target: `${process.env.CENTRAL_WS_API_PREFIX}/color`
+})
+
 app.use(express.json());
 app.use(cors());
 
@@ -110,18 +120,6 @@ app.get('/cheermotes', asyncHandler(async (req, res) => {
   }))
 
   res.json(response.data)
-}))
-
-app.use(createProxyMiddleware({
-  pathFilter: '/kick/chat',
-  target: 'wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.4.0&flash=false',
-  changeOrigin: true,
-  ws: true,
-}))
-app.use(createProxyMiddleware({
-  pathFilter: '/color',
-  target: `${process.env.CENTRAL_WS_API_PREFIX}/color`,
-  ws: true,
 }))
 
 app.use(function (err, req, res, next) {
