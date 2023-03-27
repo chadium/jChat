@@ -129,6 +129,19 @@ Chat = {
 
         Chat.loadCustomColors();
 
+        let customColorsSocket = new ReconnectingWebSocket(buildLocalWebsocketUrl('/custom-colors'), null, { reconnectInterval: 2000 });
+        customColorsSocket.onmessage = (e) => {
+            let data = JSON.parse(e.data)
+
+            if (data.newColor) {
+                if (data.newColor.platformId === platform.KICK) {
+                    Chat.info.kick.colors[data.newColor.username] = data.newColor.color
+                } else if (data.newColor.platformId === platform.TWITCH) {
+                    Chat.info.colors[data.newColor.username] = data.newColor.color
+                }
+            }
+        }
+
         // Load CSS
         let font = fonts[Chat.info.font];
 
@@ -218,7 +231,7 @@ Chat = {
             });
         }
 
-        let socket = new ReconnectingWebSocket(buildLocalWebsocketUrl('/color'), 'irc', { reconnectInterval: 2000 });
+        let socket = new ReconnectingWebSocket(buildLocalWebsocketUrl('/color'), null, { reconnectInterval: 2000 });
         socket.onmessage = (e) => {
             let data = JSON.parse(e.data)
 
@@ -428,6 +441,7 @@ Chat = {
     },
 
     write: function(nick, info, message) {
+        //message = toPigLatin(message)
         if (info) {
             var $chatLine = $('<div></div>');
             $chatLine.addClass('chat_line');

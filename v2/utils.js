@@ -88,3 +88,40 @@ async function webpaginationGetAll(cb) {
 
     return data.flat()
 }
+
+function toPigLatin(sentence) {
+    // Split the sentence into an array of words
+    const words = sentence.split(" ");
+
+    // Define an array of vowels to check against
+    const vowels = ["a", "e", "i", "o", "u"];
+
+    // Define an empty array to store the Pig Latin words
+    let pigLatinWords = [];
+
+    // Loop through each word in the array
+    for (let i = 0; i < words.length; i++) {
+        // Get the current word and convert it to lowercase
+        const word = words[i].toLowerCase();
+
+        // Check if the first letter is a vowel
+        if (vowels.includes(word[0])) {
+            pigLatinWords.push(word + "way"); // Add "way" to the end of the word
+        } else {
+            // Find the index of the first vowel in the word
+            let vowelIndex = -1;
+            for (let j = 0; j < word.length; j++) {
+                if (vowels.includes(word[j])) {
+                    vowelIndex = j;
+                    break;
+                }
+            }
+
+            // Rearrange the word and add "ay" to the end
+            pigLatinWords.push(word.slice(vowelIndex) + word.slice(0, vowelIndex) + "ay");
+        }
+    }
+
+    // Join the Pig Latin words back into a sentence
+    return pigLatinWords.join(" ");
+}

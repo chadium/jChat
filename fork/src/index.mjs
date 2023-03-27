@@ -66,6 +66,11 @@ httpProxy.websocketProxy({
   target: `${process.env.CENTRAL_WS_API_PREFIX}/color`
 })
 
+httpProxy.websocketProxy({
+  path: '/custom-colors',
+  target: `${process.env.CENTRAL_WS_API_PREFIX}/overlay/chat/user/color`
+})
+
 app.use(express.json());
 app.use(cors());
 
