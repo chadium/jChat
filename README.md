@@ -1,15 +1,20 @@
-# [![](https://www.giambaj.it/twitch/jchat/img/peepoHappysmall.png)](#) jChat [![GitHub version](https://img.shields.io/badge/release-v2.3.4-blue)](#) [![Website giambaj.it](https://img.shields.io/website-up-down-green-red/https/giambaj.it.svg)](https://www.giambaj.it/twitch/jchat/) [![GitHub license](https://img.shields.io/github/license/giambaJ/jChat)](https://github.com/giambaJ/jChat/blob/main/LICENSE)
+Chad Thundercock's fork of: [giambaJ/jChat](https://github.com/giambaJ/jChat)
 
-**jChat** is an overlay that allows you to show your Twitch chat on screen with OBS, XSplit, and any other streaming software that supports browser sources. It supports your [**BetterTTV**](https://betterttv.com/), [**FrankerFaceZ**](https://www.frankerfacez.com/) and [**7TV**](https://7tv.app/) emotes, always at the best available quality. You have many options to customize your chat, like enabling a smooth animation for new messages, or fading old ones after some time. If you have a chat full of !gamble addicts, you can choose to hide bots and commands messages. It also comes with many fonts and styling options that can be combined as desired.
-### The app is up and running on the [**website**](https://www.giambaj.it/twitch/jchat/).
-## Features
-- 7TV, BTTV and FFZ emotes support
-- Custom channel badges
-- Lots of fonts and styling options
-- Twitter emojis
-- 7TV, BTTV, FFZ, FFZ:AP and Chatterino user badges (on/off)
-- Smooth animation (on/off)
-- Fade old messages (on/off)
-- Hide bots messages (on/off)
-- Hide commands messages (on/off)
-- !refreshoverlay to make newly added emotes appear (mods only)
+I think jChat is pretty cool but I wanted to customize it even further. Why?
+Because I can! I dug deep into the code and was greeted with undefined
+variables and outdated Twitch APIs. I was like, "No way am I letting this stop
+me!" So I busted out my trusty notepad and went to town like a plumber in a
+leaky bathroom. Notably:
+
+- Introduced a service that, not only serves the frontend code, also provides
+  data.
+- Replaced old and deprecated Twitch API with the shiny new Helix API.
+- Shows messages from Kick.com chat. Supports emojis and emotes!  No support
+  for badges because...
+- Added support for my own custom badges!
+- Even sharpened some edges and created a customized theme, because aesthetics.
+
+Now, I must warn you, this fork is definitely a "works on my machine"
+situation. But hey, I'm a generous guy and I believe in sharing is caring, so
+I'm putting it out there for all to have a good starting point on how to make
+jChat work locally. Just open up the michael jackson files and hack away, baby!
