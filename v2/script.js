@@ -477,6 +477,12 @@ Chat = {
 
             // Custom badges.
             if (Chat.info.customBadges) {
+                let username = nick
+
+                if (info.twitchNameEquivalentHackerino) {
+                    username = info.twitchNameEquivalentHackerino
+                }
+
                 if (Chat.info.customBadges.users[nick]) {
                     for (let index of Chat.info.customBadges.users[nick]) {
                         let url = Chat.info.customBadges.badges[index]
@@ -739,6 +745,7 @@ Chat = {
                         "display-name": undefined,
                         bits: undefined,
                         emotes: undefined,
+                        twitchNameEquivalentHackerino: payload.username.toLowerCase(),
                         parseKickEmotes: true
                     }
 
