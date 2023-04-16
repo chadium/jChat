@@ -483,8 +483,8 @@ Chat = {
                     username = info.twitchNameEquivalentHackerino
                 }
 
-                if (Chat.info.customBadges.users[nick]) {
-                    for (let index of Chat.info.customBadges.users[nick]) {
+                if (Chat.info.customBadges.users[username]) {
+                    for (let index of Chat.info.customBadges.users[username]) {
                         let url = Chat.info.customBadges.badges[index]
 
                         var $badge = $('<img/>');
