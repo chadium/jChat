@@ -119,6 +119,14 @@ app.get('/custom-colors', asyncHandler(async (req, res) => {
   res.json(response.data)
 }))
 
+app.get('/kcik/colors', asyncHandler(async (req, res) => {
+  let { data } = await twentyEightApiFetch({
+    url: 'https://kcik.chadium.dev:7777/v1/list-colors'
+  })
+
+  res.json(data)
+}))
+
 app.get('/kick/assets/urls', asyncHandler(async (req, res) => {
   let { data } = await twentyEightApiFetch({
     url: `${process.env.KICK_FORBIDDEN_HTTP_API_PREFIX}/assets/urls`

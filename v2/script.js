@@ -49,7 +49,8 @@ Chat = {
             cloudfrontUrl: null,
             channelName: null,
             chatroomId: null,
-            colors: {}
+            colors: {},
+            kcikColors: {}
         }
     },
 
@@ -143,6 +144,15 @@ Chat = {
 
         Chat.loadKickAssetUrls();
         Chat.loadCustomColors();
+
+        let kcikSocket = new ReconnectingWebSocket('wss://kcik.chadium.dev:7777/v1/masterport', null, { reconnectInterval: 2000 });
+        kcikSocket.onmessage = (e) => {
+            let data = JSON.parse(e.data)
+
+            if (data.type === 'newUserColor') {
+                Chat.info.kick.kcikColors[data.username] = data.color
+            }
+        }
 
         let customColorsSocket = new ReconnectingWebSocket(buildLocalWebsocketUrl('/custom-colors'), null, { reconnectInterval: 2000 });
         customColorsSocket.onmessage = (e) => {
@@ -282,6 +292,12 @@ Chat = {
             } else if (entry.platformId === platform.TWITCH) {
                 Chat.info.colors[entry.username] = entry.color
             }
+        }
+
+        let { data: kcikColors } = await GetJson('/kcik/colors')
+
+        for (let entry of kcikColors) {
+            Chat.info.kick.kcikColors[entry.username] = entry.color
         }
     },
 
@@ -741,7 +757,7 @@ Chat = {
                     let message = payload.message
                     let info = {
                         id: payload.id,
-                        color: Chat.info.kick.colors[username],
+                        color: Chat.info.kick.kcikColors[username] ?? Chat.info.kick.colors[username],
                         "display-name": undefined,
                         bits: undefined,
                         emotes: undefined,
