@@ -29,7 +29,7 @@ async function twitchUserId(session, login) {
 
 async function kickUserInfo(username) {
   let { data } = await twentyEightApiFetch({
-    url: `${process.env.KICK_FORBIDDEN_HTTP_API_PREFIX}/channel/id`,
+    url: `${process.env.KICK_CHADIUM_HTTP_API_PREFIX}/channel/id`,
     query: {
       channel: username
     }
@@ -58,7 +58,7 @@ const httpProxy = new HttpProxy({ server })
 
 httpProxy.websocketProxy({
   path: '/kick/chat',
-  target: `${process.env.KICK_FORBIDDEN_WS_API_PREFIX}/chat?channel=${encodeURIComponent(process.env.KICK_CHANNEL)}`,
+  target: `${process.env.KICK_CHADIUM_WS_API_PREFIX}/chat?channel=${encodeURIComponent(process.env.KICK_CHANNEL)}`,
 })
 
 httpProxy.websocketProxy({
@@ -129,7 +129,7 @@ app.get('/kcik/colors', asyncHandler(async (req, res) => {
 
 app.get('/kick/assets/urls', asyncHandler(async (req, res) => {
   let { data } = await twentyEightApiFetch({
-    url: `${process.env.KICK_FORBIDDEN_HTTP_API_PREFIX}/assets/urls`
+    url: `${process.env.KICK_CHADIUM_HTTP_API_PREFIX}/assets/urls`
   })
 
   res.json(data)
