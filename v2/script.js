@@ -50,7 +50,16 @@ Chat = {
             channelName: null,
             chatroomId: null,
             colors: {},
-            kcikColors: {}
+            kcikColors: {},
+            customBadges: {
+                users: {
+                    'supitsj': [0],
+                    '13lake': [0]
+                },
+                badges: [
+                    'https://cdn.the28yearoldboomer.com/media/star.png'
+                ]
+            },
         }
     },
 
@@ -502,6 +511,15 @@ Chat = {
                 if (Chat.info.customBadges.users[username]) {
                     for (let index of Chat.info.customBadges.users[username]) {
                         let url = Chat.info.customBadges.badges[index]
+
+                        var $badge = $('<img/>');
+                        $badge.addClass('badge');
+                        $badge.attr('src', url);
+                        $userBadge.append($badge);
+                    }
+                } else if (Chat.info.kick.customBadges.users[username]) {
+                    for (let index of Chat.info.kick.customBadges.users[username]) {
+                        let url = Chat.info.kick.customBadges.badges[index]
 
                         var $badge = $('<img/>');
                         $badge.addClass('badge');
