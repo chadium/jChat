@@ -54,10 +54,13 @@ Chat = {
             customBadges: {
                 users: {
                     'supitsj': [0],
-                    '13lake': [0]
+                    'Yoweb': [0],
+                    'elDeesha': [0],
+                    'sperging': [1]
                 },
                 badges: [
-                    'https://cdn.the28yearoldboomer.com/media/star.png'
+                    'https://cdn.the28yearoldboomer.com/media/star.png',
+                    'https://cdn.chadium.dev/file/izuramfdsj/clip-rank.png'
                 ]
             },
         }
