@@ -50,19 +50,7 @@ Chat = {
             channelName: null,
             chatroomId: null,
             colors: {},
-            kcikColors: {},
-            customBadges: {
-                users: {
-                    'supitsj': [0],
-                    'Yoweb': [0],
-                    'elDeesha': [0],
-                    'sperging': [1]
-                },
-                badges: [
-                    'https://cdn.the28yearoldboomer.com/media/star.png',
-                    'https://cdn.chadium.dev/file/izuramfdsj/clip-rank.png'
-                ]
-            },
+            kcikColors: {}
         }
     },
 
@@ -504,30 +492,28 @@ Chat = {
 //             `);
 
             // Custom badges.
-            if (Chat.info.customBadges) {
-                let username = nick
+            if (Chat.info.customBadges !== null) {
+                if (info.platformId === platform.TWITCH) {
+                    if (Chat.info.customBadges.chatters.twitch !== undefined) {
+                        for (let index of Chat.info.customBadges.chatters.twitch[nick]) {
+                            let url = Chat.info.customBadges.badges[index]
 
-                if (info.twitchNameEquivalentHackerino) {
-                    username = info.twitchNameEquivalentHackerino
-                }
-
-                if (Chat.info.customBadges.users[username]) {
-                    for (let index of Chat.info.customBadges.users[username]) {
-                        let url = Chat.info.customBadges.badges[index]
-
-                        var $badge = $('<img/>');
-                        $badge.addClass('badge');
-                        $badge.attr('src', url);
-                        $userBadge.append($badge);
+                            var $badge = $('<img/>');
+                            $badge.addClass('badge');
+                            $badge.attr('src', url);
+                            $userBadge.append($badge);
+                        }
                     }
-                } else if (Chat.info.kick.customBadges.users[username]) {
-                    for (let index of Chat.info.kick.customBadges.users[username]) {
-                        let url = Chat.info.kick.customBadges.badges[index]
+                } else if (info.platformId === platform.KICK) {
+                    if (Chat.info.customBadges.chatters.kick !== undefined) {
+                        for (let index of Chat.info.customBadges.chatters.kick[nick]) {
+                            let url = Chat.info.customBadges.badges[index]
 
-                        var $badge = $('<img/>');
-                        $badge.addClass('badge');
-                        $badge.attr('src', url);
-                        $userBadge.append($badge);
+                            var $badge = $('<img/>');
+                            $badge.addClass('badge');
+                            $badge.attr('src', url);
+                            $userBadge.append($badge);
+                        }
                     }
                 }
             }
@@ -746,6 +732,8 @@ Chat = {
                             if (Chat.info.bttvBadges && Chat.info.seventvBadges && Chat.info.chatterinoBadges && Chat.info.ffzapBadges && !Chat.info.userBadges[nick]) Chat.loadUserBadges(nick, message.tags['user-id']);
                         }
 
+                        message.tags.platformId = platform.TWITCH
+
                         Chat.write(nick, message.tags, message.params[1]);
                         return;
                 }
@@ -782,8 +770,8 @@ Chat = {
                         "display-name": undefined,
                         bits: undefined,
                         emotes: undefined,
-                        twitchNameEquivalentHackerino: payload.username.toLowerCase(),
-                        parseKickEmotes: true
+                        parseKickEmotes: true,
+                        platformId: platform.KICK
                     }
 
                     if (Chat.info.hideCommands) {

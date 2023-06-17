@@ -136,12 +136,15 @@ app.get('/kick/assets/urls', asyncHandler(async (req, res) => {
 }))
 
 app.get('/user-badges', asyncHandler(async (req, res) => {
-  let response = await twentyEightApiFetch({
-    url: `${process.env.CENTRAL_HTTP_API_PREFIX}/custom-badges/twitch`,
-    query: {}
+  let { data } = await twentyEightApiFetch({
+    url: `${process.env.CENTRAL_HTTP_API_PREFIX}/custom-badges/by-platform`,
+    queryData: {
+      twitch: true,
+      kick: true
+    }
   })
 
-  res.json(response.data)
+  res.json(data)
 }))
 
 app.get('/cheermotes', asyncHandler(async (req, res) => {

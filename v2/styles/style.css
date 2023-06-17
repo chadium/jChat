@@ -115,8 +115,9 @@ body {
 
 .badge {
     vertical-align: bottom;
-    width: var(--daniel-chat-line-height);
-    height: var(--daniel-chat-line-height);
+    padding-bottom: 2px;
+    width: calc(var(--daniel-chat-line-height) - 4px);
+    height: calc(var(--daniel-chat-line-height) - 4px);
 }
 
 .message {
